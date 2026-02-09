@@ -32,4 +32,6 @@ public:
 	Seek() = default;
 	virtual ~Seek() override = default;
 
+	//steering
+	virtual SteeringOutput CalculateSteering(float Deltat, ASteeringAgent& Agent) override;
 };
