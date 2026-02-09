@@ -28,6 +28,26 @@ SteeringOutput Flee::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
 	return Steering;
 }
 
+SteeringOutput Face::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
+{
+	if (FirstCall)
+	{
+		MaxSpeed = Agent.GetMaxLinearSpeed();
+		FirstCall = false;
+	}
+	
+	SteeringOutput Steering{};
+
+	Steering.LinearVelocity = Target.Position - Agent.GetPosition();
+	Steering.LinearVelocity.Normalize(); //Already happens when processed
+	
+	Agent.SetMaxLinearSpeed(0.f);
+
+	//Add debug rendering for grades :3
+
+	return Steering;
+}
+
 SteeringOutput Arrive::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
 {
 	if (FirstCall)
@@ -59,17 +79,6 @@ SteeringOutput Arrive::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
 	{
 		Agent.SetMaxLinearSpeed(MaxSpeed);
 	}
-
-	//Add debug rendering for grades :3
-
-	return Steering;
-}
-
-SteeringOutput Face::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
-{
-	SteeringOutput Steering{};
-
-	Steering.AngularVelocity = Target.AngularVelocity - Agent.GetRotation();
 
 	//Add debug rendering for grades :3
 

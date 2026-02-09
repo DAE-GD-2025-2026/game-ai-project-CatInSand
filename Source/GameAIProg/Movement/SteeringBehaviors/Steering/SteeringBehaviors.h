@@ -66,6 +66,9 @@ class Face : public ISteeringBehavior
 public:
 	Face() = default;
 	virtual ~Face() override = default;
+	
+	float MaxSpeed{};
+	bool FirstCall{ true };
 
 	//steering
 	virtual SteeringOutput CalculateSteering(float DeltaT, ASteeringAgent& Agent) override;
