@@ -52,8 +52,8 @@ public:
 	Arrive() = default;
 	virtual ~Arrive() override = default;
 	
-	const float SlowRadius{ 100.f };
-	const float TargetRadius{ 10.f };
+	const float SlowRadius{ 300.f };
+	const float TargetRadius{ 50.f };
 	float MaxSpeed{};
 	bool FirstCall{ true };
 

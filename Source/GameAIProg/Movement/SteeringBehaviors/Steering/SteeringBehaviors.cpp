@@ -9,6 +9,8 @@
 SteeringOutput Seek::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
 {
 	SteeringOutput Steering{};
+	
+	Steering.AngularVelocity = 10.f * DeltaT;
 
 	float Distance{ static_cast<float>((Target.Position - Agent.GetPosition()).Length()) };
 	FVector2D Direction{ (Target.Position - Agent.GetPosition()).GetSafeNormal() };
@@ -122,7 +124,7 @@ SteeringOutput Arrive::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
 		16,
 		FColor::Blue,
 		false,-1,0,0,
-		FVector(0,0,1), FVector(1,0,0));
+		FVector(0,1,0), FVector(1,0,0));
 	
 	//TargetCircle
 	DrawDebugCircle(
@@ -132,7 +134,7 @@ SteeringOutput Arrive::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
 		16,
 		FColor::Orange,
 		false,-1,0,0,
-		FVector(0,0,1), FVector(1,0,0));
+		FVector(0,1,0), FVector(1,0,0));
 
 	return Steering;
 }
