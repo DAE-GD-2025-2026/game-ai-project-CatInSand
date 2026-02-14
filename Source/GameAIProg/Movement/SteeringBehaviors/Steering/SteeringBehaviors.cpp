@@ -3,14 +3,9 @@
 #include "MeshPaintVisualize.h"
 #include "GameAIProg/Movement/SteeringBehaviors/SteeringAgent.h"
 
-//SEEK
-//*******
-// TODO: Do the Week01 assignment :^)
 SteeringOutput Seek::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
 {
 	SteeringOutput Steering{};
-	
-	Steering.AngularVelocity = 10.f * DeltaT;
 
 	float Distance{ static_cast<float>((Target.Position - Agent.GetPosition()).Length()) };
 	FVector2D Direction{ (Target.Position - Agent.GetPosition()).GetSafeNormal() };

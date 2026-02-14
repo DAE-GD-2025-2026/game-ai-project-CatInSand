@@ -108,8 +108,8 @@ public:
 	void SetMaxAngleChange(float rad) { MaxAngleChange = rad; }
 	
 protected:
-	float CircleDistance{ 6.f };
-	float CircleRadius{ 4.f };
+	float CircleDistance{ 300.f };
+	float CircleRadius{ 200.f };
 	float MaxAngleChange = 45 / 180.f * PI;
 	float WanderAngle{ 0.f };
 };
