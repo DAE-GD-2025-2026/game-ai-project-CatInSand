@@ -9,27 +9,27 @@ SteeringOutput Seek::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
 
 	float Distance{ static_cast<float>((Target.Position - Agent.GetPosition()).Length()) };
 	FVector2D Direction{ (Target.Position - Agent.GetPosition()).GetSafeNormal() };
-	if (Distance > 1.f)
+	if (Distance > DeltaT * Agent.GetMaxLinearSpeed())
 	{
 		Steering.LinearVelocity = Direction;
+		
+		//Debug
+		FVector2D AgentViewDir{ Agent.GetLinearVelocity().GetSafeNormal() };
+	
+		//ToTarget
+		DrawDebugLine(
+			Agent.GetWorld(),
+			FVector(Agent.GetPosition(), 0.f),
+			FVector(Agent.GetPosition() + Direction * Agent.GetMaxLinearSpeed(), 0.f),
+			FColor::Red);
+	
+		//ViewDir
+		DrawDebugLine(
+			Agent.GetWorld(),
+			FVector(Agent.GetPosition(), 0.f),
+			FVector(Agent.GetPosition() + AgentViewDir * Agent.GetMaxLinearSpeed(), 0.f),
+			FColor::Green);
 	}
-	
-	//Debug
-	FVector2D AgentViewDir{ Agent.GetLinearVelocity().GetSafeNormal() };
-	
-	//ToTarget
-	DrawDebugLine(
-		Agent.GetWorld(),
-		FVector(Agent.GetPosition().X, Agent.GetPosition().Y, 0.f),
-		FVector(Agent.GetPosition().X + Direction.X * Agent.GetMaxLinearSpeed(), Agent.GetPosition().Y + Direction.Y * Agent.GetMaxLinearSpeed(), 0.f),
-		FColor::Red);
-	
-	//ViewDir
-	DrawDebugLine(
-		Agent.GetWorld(),
-		FVector(Agent.GetPosition().X, Agent.GetPosition().Y, 0.f),
-		FVector(Agent.GetPosition().X + AgentViewDir.X * Agent.GetMaxLinearSpeed(), Agent.GetPosition().Y + AgentViewDir.Y * Agent.GetMaxLinearSpeed(), 0.f),
-		FColor::Green);
 
 	return Steering;
 }
@@ -48,15 +48,15 @@ SteeringOutput Flee::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
 	//Away from target
 	DrawDebugLine(
 		Agent.GetWorld(),
-		FVector(Agent.GetPosition().X, Agent.GetPosition().Y, 0.f),
-		FVector(Agent.GetPosition().X + Direction.X * Agent.GetMaxLinearSpeed(), Agent.GetPosition().Y + Direction.Y * Agent.GetMaxLinearSpeed(), 0.f),
+		FVector(Agent.GetPosition(), 0.f),
+		FVector(Agent.GetPosition() + Direction * Agent.GetMaxLinearSpeed(), 0.f),
 		FColor::Red);
 	
 	//ViewDir
 	DrawDebugLine(
 		Agent.GetWorld(),
-		FVector(Agent.GetPosition().X, Agent.GetPosition().Y, 0.f),
-		FVector(Agent.GetPosition().X + AgentViewDir.X * Agent.GetMaxLinearSpeed(), Agent.GetPosition().Y + AgentViewDir.Y * Agent.GetMaxLinearSpeed(), 0.f),
+		FVector(Agent.GetPosition(), 0.f),
+		FVector(Agent.GetPosition() + AgentViewDir * Agent.GetMaxLinearSpeed(), 0.f),
 		FColor::Green);
 
 	return Steering;
@@ -100,21 +100,21 @@ SteeringOutput Arrive::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
 	//Away from target
 	DrawDebugLine(
 		Agent.GetWorld(),
-		FVector(Agent.GetPosition().X, Agent.GetPosition().Y, 0.f),
-		FVector(Agent.GetPosition().X + Direction.X * Agent.GetMaxLinearSpeed(), Agent.GetPosition().Y + Direction.Y * Agent.GetMaxLinearSpeed(), 0.f),
+		FVector(Agent.GetPosition(), 0.f),
+		FVector(Agent.GetPosition() + Direction * Agent.GetMaxLinearSpeed(), 0.f),
 		FColor::Red);
 	
 	//ViewDir
 	DrawDebugLine(
 		Agent.GetWorld(),
-		FVector(Agent.GetPosition().X, Agent.GetPosition().Y, 0.f),
-		FVector(Agent.GetPosition().X + AgentViewDir.X * Agent.GetMaxLinearSpeed(), Agent.GetPosition().Y + AgentViewDir.Y * Agent.GetMaxLinearSpeed(), 0.f),
+		FVector(Agent.GetPosition(), 0.f),
+		FVector(Agent.GetPosition() + AgentViewDir * Agent.GetMaxLinearSpeed(), 0.f),
 		FColor::Green);
 	
 	//SlowCircle
 	DrawDebugCircle(
 		Agent.GetWorld(),
-		FVector(Agent.GetPosition().X, Agent.GetPosition().Y, 0.f),
+		FVector(Agent.GetPosition(), 0.f),
 		SlowRadius,
 		16,
 		FColor::Blue,
@@ -124,7 +124,7 @@ SteeringOutput Arrive::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
 	//TargetCircle
 	DrawDebugCircle(
 		Agent.GetWorld(),
-		FVector(Agent.GetPosition().X, Agent.GetPosition().Y, 0.f),
+		FVector(Agent.GetPosition(), 0.f),
 		TargetRadius,
 		16,
 		FColor::Orange,
@@ -162,9 +162,13 @@ SteeringOutput Pursuit::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
 	const float Distance{ static_cast<float>((Target.Position - Agent.GetPosition()).Length()) };
 	const float ArrivalTime{ Distance / Agent.GetMaxLinearSpeed() }; //time until collision if target is static
 	const FVector2D DisplacedPosition{ Target.Position + Target.LinearVelocity * ArrivalTime }; //position of target if it moves at constant velocity and direction
+	
+	FVector2D Direction{ (DisplacedPosition - Agent.GetPosition()).GetSafeNormal() };
+	
+	Steering.LinearVelocity = Direction;
 
-	Steering.LinearVelocity = DisplacedPosition - Agent.GetPosition();
-	Steering.LinearVelocity.Normalize(); //Already happens when processed
+	//Debug
+	FVector2D AgentViewDir{ Agent.GetLinearVelocity().GetSafeNormal() };
 
 	//Add debug rendering for grades :3
 
@@ -178,9 +182,13 @@ SteeringOutput Evade::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
 	const float Distance{ static_cast<float>((Target.Position - Agent.GetPosition()).Length()) };
 	const float ArrivalTime{ Distance / Agent.GetMaxLinearSpeed() }; //time until collision if target is static
 	const FVector2D DisplacedPosition{ Target.Position + Target.LinearVelocity * ArrivalTime }; //position of target if it moves at constant velocity and direction
+	
+	FVector2D Direction{ -(DisplacedPosition - Agent.GetPosition()).GetSafeNormal() };
+	
+	Steering.LinearVelocity = Direction;
 
-	Steering.LinearVelocity = -(DisplacedPosition - Agent.GetPosition());
-	Steering.LinearVelocity.Normalize(); //Already happens when processed
+	//Debug
+	FVector2D AgentViewDir{ Agent.GetLinearVelocity().GetSafeNormal() };
 
 	//Add debug rendering for grades :3
 
@@ -191,9 +199,8 @@ SteeringOutput Wander::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
 {
 	SteeringOutput Steering{};
 	
-	const float Angle{ static_cast<float>(rand() % 180) / 180.f * PI };
-	const FVector2D TargetPosition{ Agent.GetPosition() + Agent.GetLinearVelocity().Normalize() * CircleDistance + FVector2D{cos(Angle) * CircleRadius, sin(Angle) * CircleRadius} };
-
+	const float Angle{ static_cast<float>(rand() % 360) / 180.f * PI };
+	const FVector2D TargetPosition{ Agent.GetPosition() + Agent.GetLinearVelocity().GetSafeNormal() * CircleDistance + FVector2D{cos(Angle) * CircleRadius, sin(Angle) * CircleRadius} };
 	Steering.LinearVelocity = TargetPosition - Agent.GetPosition();
 	Steering.LinearVelocity.Normalize(); //Already happens when processed
 
