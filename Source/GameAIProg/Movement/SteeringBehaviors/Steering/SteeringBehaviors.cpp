@@ -170,7 +170,19 @@ SteeringOutput Pursuit::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
 	//Debug
 	FVector2D AgentViewDir{ Agent.GetLinearVelocity().GetSafeNormal() };
 
-	//Add debug rendering for grades :3
+	//Away from target
+	DrawDebugLine(
+		Agent.GetWorld(),
+		FVector(Agent.GetPosition(), 0.f),
+		FVector(Agent.GetPosition() + Direction * Agent.GetMaxLinearSpeed(), 0.f),
+		FColor::Red);
+	
+	//ViewDir
+	DrawDebugLine(
+		Agent.GetWorld(),
+		FVector(Agent.GetPosition(), 0.f),
+		FVector(Agent.GetPosition() + AgentViewDir * Agent.GetMaxLinearSpeed(), 0.f),
+		FColor::Green);
 
 	return Steering;
 }
@@ -190,7 +202,19 @@ SteeringOutput Evade::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
 	//Debug
 	FVector2D AgentViewDir{ Agent.GetLinearVelocity().GetSafeNormal() };
 
-	//Add debug rendering for grades :3
+	//Away from target
+	DrawDebugLine(
+		Agent.GetWorld(),
+		FVector(Agent.GetPosition(), 0.f),
+		FVector( Agent.GetPosition() + Direction * Agent.GetMaxLinearSpeed(), 0.f),
+		FColor::Red);
+	
+	//ViewDir
+	DrawDebugLine(
+		Agent.GetWorld(),
+		FVector(Agent.GetPosition(), 0.f),
+		FVector( Agent.GetPosition() + AgentViewDir * Agent.GetMaxLinearSpeed(), 0.f),
+		FColor::Green);
 
 	return Steering;
 }
@@ -203,8 +227,33 @@ SteeringOutput Wander::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
 	const FVector2D TargetPosition{ Agent.GetPosition() + Agent.GetLinearVelocity().GetSafeNormal() * CircleDistance + FVector2D{cos(Angle) * CircleRadius, sin(Angle) * CircleRadius} };
 	Steering.LinearVelocity = TargetPosition - Agent.GetPosition();
 	Steering.LinearVelocity.Normalize(); //Already happens when processed
-
-	//Add debug rendering for grades :3
+	
+	//Debug
+	FVector2D AgentViewDir{ Agent.GetLinearVelocity().GetSafeNormal() };
+	
+	//Next target
+	DrawDebugLine(
+		Agent.GetWorld(),
+		FVector(Agent.GetPosition(), 0.f),
+		FVector(TargetPosition, 0.f),
+		FColor::Green);
+	
+	//ViewDir
+	DrawDebugLine(
+		Agent.GetWorld(),
+		FVector(Agent.GetPosition(), 0.f),
+		FVector(Agent.GetPosition() + AgentViewDir * Agent.GetMaxLinearSpeed(), 0.f),
+		FColor::Red);
+	
+	//TargetCircle
+	DrawDebugCircle(
+		Agent.GetWorld(),
+		FVector(Agent.GetPosition() + Agent.GetLinearVelocity().GetSafeNormal() * CircleDistance, 0.f),
+		CircleRadius,
+		16,
+		FColor::Blue,
+		false,-1,0,0,
+		FVector(0,1,0), FVector(1,0,0));
 
 	return Steering;
 }
