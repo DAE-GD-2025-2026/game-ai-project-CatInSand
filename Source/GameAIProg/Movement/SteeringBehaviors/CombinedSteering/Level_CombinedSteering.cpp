@@ -21,9 +21,16 @@ void ALevel_CombinedSteering::BeginPlay()
 	WeightedBehaviors.emplace_back(WanderBehaviour, 0.5f);
 	
 	pBlendedSteering = new BlendedSteering{ std::move(WeightedBehaviors) };
+	
+	std::vector<ISteeringBehavior*> PriorityBehaviors = {};
+	
+	PriorityBehaviors.push_back(EvadeBehaviour);
+	PriorityBehaviors.push_back(WanderBehaviour);
+	
+	pPrioritySteering = new PrioritySteering{ std::move(PriorityBehaviors) };
 
 	pSteeringAgent = GetWorld()->SpawnActor<ASteeringAgent>(SteeringAgentClass, FVector{0,0,90}, FRotator::ZeroRotator);
-	pSteeringAgent->SetSteeringBehavior(pBlendedSteering);
+	pSteeringAgent->SetSteeringBehavior(pPrioritySteering);
 	UpdateTarget();
 }
 

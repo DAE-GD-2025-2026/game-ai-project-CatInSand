@@ -216,6 +216,11 @@ SteeringOutput Evade::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
 	FVector2D Direction{ -(DisplacedPosition - Agent.GetPosition()).GetSafeNormal() };
 	
 	Steering.LinearVelocity = Direction;
+	
+	if (Distance > EvadeRadius)
+	{
+		Steering.IsValid = false;
+	}
 
 	//Debug
 	FVector2D AgentViewDir{ Agent.GetLinearVelocity().GetSafeNormal() };

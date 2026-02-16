@@ -36,6 +36,8 @@ private:
 
 	Seek* SeekBehaviour{ new Seek() };
 	Wander* WanderBehaviour{ new Wander() };
+	Evade* EvadeBehaviour{ new Evade() };
 	BlendedSteering* pBlendedSteering{ nullptr };
+	PrioritySteering* pPrioritySteering{ nullptr };
 	ASteeringAgent* pSteeringAgent{ nullptr };
 };
