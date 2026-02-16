@@ -28,9 +28,14 @@ protected:
 	virtual void BeginDestroy() override;
 
 private:
+	void UpdateTarget();
+	
 	//Datamembers
 	bool UseMouseTarget = false;
 	bool CanDebugRender = false;
 
-	
+	Seek* SeekBehaviour{ new Seek() };
+	Wander* WanderBehaviour{ new Wander() };
+	BlendedSteering* pBlendedSteering{ nullptr };
+	ASteeringAgent* pSteeringAgent{ nullptr };
 };

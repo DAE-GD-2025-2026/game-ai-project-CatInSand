@@ -14,13 +14,39 @@ ALevel_CombinedSteering::ALevel_CombinedSteering()
 void ALevel_CombinedSteering::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	std::vector<BlendedSteering::WeightedBehavior> WeightedBehaviors = {};
+	
+	WeightedBehaviors.emplace_back(SeekBehaviour, 0.5f);
+	WeightedBehaviors.emplace_back(WanderBehaviour, 0.5f);
+	
+	pBlendedSteering = new BlendedSteering{ std::move(WeightedBehaviors) };
 
+	pSteeringAgent = GetWorld()->SpawnActor<ASteeringAgent>(SteeringAgentClass, FVector{0,0,90}, FRotator::ZeroRotator);
+	pSteeringAgent->SetSteeringBehavior(pBlendedSteering);
+	UpdateTarget();
 }
 
 void ALevel_CombinedSteering::BeginDestroy()
 {
 	Super::BeginDestroy();
 
+	delete SeekBehaviour;
+	SeekBehaviour = nullptr;
+	delete WanderBehaviour;
+	WanderBehaviour = nullptr;
+	
+	delete pBlendedSteering;
+	pBlendedSteering = nullptr;
+	delete pSteeringAgent;
+	pSteeringAgent = nullptr;
+}
+
+void ALevel_CombinedSteering::UpdateTarget()
+{
+	// Note: MouseTarget position is updated via Level BP every click
+	
+	pBlendedSteering->SetTarget(MouseTarget);
 }
 
 // Called every frame
@@ -85,16 +111,18 @@ void ALevel_CombinedSteering::Tick(float DeltaTime)
 		ImGui::Spacing();
 
 
-		// ImGuiHelpers::ImGuiSliderFloatWithSetter("Seek",
-		// 	pBlendedSteering->GetWeightedBehaviorsRef()[0].Weight, 0.f, 1.f,
-		// 	[this](float InVal) { pBlendedSteering->GetWeightedBehaviorsRef()[0].Weight = InVal; }, "%.2f");
-		//
-		// ImGuiHelpers::ImGuiSliderFloatWithSetter("Wander",
-		// pBlendedSteering->GetWeightedBehaviorsRef()[1].Weight, 0.f, 1.f,
-		// [this](float InVal) { pBlendedSteering->GetWeightedBehaviorsRef()[1].Weight = InVal; }, "%.2f");
-	
+		ImGuiHelpers::ImGuiSliderFloatWithSetter("Seek",
+		pBlendedSteering->GetWeightedBehaviorsRef()[0].Weight, 0.f, 1.f,
+		[this](float InVal) { pBlendedSteering->GetWeightedBehaviorsRef()[0].Weight = InVal; }, "%.2f");
+		
+		ImGuiHelpers::ImGuiSliderFloatWithSetter("Wander",
+		pBlendedSteering->GetWeightedBehaviorsRef()[1].Weight, 0.f, 1.f,
+		[this](float InVal) { pBlendedSteering->GetWeightedBehaviorsRef()[1].Weight = InVal; }, "%.2f");
+		
 		//End
 		ImGui::End();
+		
+		UpdateTarget();
 	}
 #pragma endregion
 	
