@@ -54,6 +54,7 @@ void ALevel_CombinedSteering::UpdateTarget()
 	// Note: MouseTarget position is updated via Level BP every click
 	
 	pBlendedSteering->SetTarget(MouseTarget);
+	pPrioritySteering->SetTarget(MouseTarget);
 }
 
 // Called every frame
